@@ -7,7 +7,8 @@ that retrieves relevant documents from a vector store and generates responses us
 from dotenv import load_dotenv
 from langchain.chat_models import init_chat_model
 from langchain_chroma import Chroma
-from langchain_core.messages import HumanMessage, SystemMessage
+from langchain_core.documents import Document
+from langchain_core.messages import BaseMessage, HumanMessage, SystemMessage
 from langchain_openai import OpenAIEmbeddings
 from langgraph.graph import END, START, StateGraph
 
@@ -17,7 +18,7 @@ from agent.state import AgentState
 load_dotenv()
 
 
-def retrieve_documents(state: AgentState):
+def retrieve_documents(state: AgentState) -> dict[str, list[Document]]:
     """Retrieve relevant documents from vector store based on the user's question.
 
     Args:
@@ -50,7 +51,7 @@ def retrieve_documents(state: AgentState):
     return {"documents": sorted_documents}
 
 
-def generate_response(state: AgentState):
+def generate_response(state: AgentState) -> dict[str, list[BaseMessage]]:
     """Generate a response using LLM based on retrieved documents and user question.
 
     Args:
