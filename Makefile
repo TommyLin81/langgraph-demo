@@ -52,6 +52,31 @@ spell_fix:
 	uv run codespell --toml pyproject.toml -w
 
 ######################
+# DOCKER
+######################
+gen_dockerfile:
+	uv run langgraph dockerfile ./deployment/docker/Dockerfile
+
+docker_build:
+	docker compose -f ./deployment/docker/docker-compose.yml build
+
+docker_up:
+	docker compose -f ./deployment/docker/docker-compose.yml up -d
+
+docker_down:
+	docker compose -f ./deployment/docker/docker-compose.yml down
+
+gen_aws_docs_index:
+	docker compose -f ./deployment/docker/docker-compose.yml exec langgraph-api python src/tools/indexer.py
+
+######################
+# Development
+######################
+langgraph_studio:
+	open https://smith.langchain.com/studio/?baseUrl=http://localhost:8123
+
+
+######################
 # HELP
 ######################
 
