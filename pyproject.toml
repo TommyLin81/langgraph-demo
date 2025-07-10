@@ -46,6 +46,9 @@ lint.ignore = [
 [tool.ruff.lint.pydocstyle]
 convention = "google"
 
+[tool.pytest.ini_options]
+pythonpath = "src"
+
 [dependency-groups]
 dev = [
     "anyio>=4.7.0",
