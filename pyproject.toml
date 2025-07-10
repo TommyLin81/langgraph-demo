@@ -1,35 +1,27 @@
 [project]
-name = "agent"
-version = "0.0.1"
-description = "Starter template for making a new agent LangGraph."
+name = "langgraph-demo"
+version = "0.1.0"
+description = "RAG AI Agent demo using LangGraph"
 authors = [
-    { name = "William Fu-Hinthorn", email = "13333726+hinthornw@users.noreply.github.com" },
+    { name = "Tommy Lin", email = "tommy81a15469@gmail.com" },
 ]
 readme = "README.md"
 license = { text = "MIT" }
-requires-python = ">=3.9"
+requires-python = ">=3.13"
 dependencies = [
+    "beautifulsoup4>=4.13.4",
+    "langchain[openai]>=0.3.26",
+    "langchain-chroma>=0.2.4",
+    "langchain-community>=0.3.27",
+    "langchain-text-splitters>=0.3.8",
     "langgraph>=0.2.6",
     "python-dotenv>=1.0.1",
+    "rich>=14.0.0",
+    "pydantic>=2.11.7",
 ]
-
 
 [project.optional-dependencies]
 dev = ["mypy>=1.11.1", "ruff>=0.6.1"]
-
-[build-system]
-requires = ["setuptools>=73.0.0", "wheel"]
-build-backend = "setuptools.build_meta"
-
-[tool.setuptools]
-packages = ["langgraph.templates.agent", "agent"]
-[tool.setuptools.package-dir]
-"langgraph.templates.agent" = "src/agent"
-"agent" = "src/agent"
-
-
-[tool.setuptools.package-data]
-"*" = ["py.typed"]
 
 [tool.ruff]
 lint.select = [
@@ -50,8 +42,10 @@ lint.ignore = [
     "D417",
     "E501",
 ]
+
 [tool.ruff.lint.per-file-ignores]
 "tests/*" = ["D", "UP"]
+
 [tool.ruff.lint.pydocstyle]
 convention = "google"
 
