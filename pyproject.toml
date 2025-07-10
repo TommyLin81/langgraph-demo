@@ -20,9 +20,6 @@ dependencies = [
     "pydantic>=2.11.7",
 ]
 
-[project.optional-dependencies]
-dev = ["mypy>=1.11.1", "ruff>=0.6.1"]
-
 [tool.ruff]
 lint.select = [
     "E",    # pycodestyle
@@ -49,11 +46,15 @@ lint.ignore = [
 [tool.ruff.lint.pydocstyle]
 convention = "google"
 
+[tool.pytest.ini_options]
+pythonpath = "src"
+
 [dependency-groups]
 dev = [
     "anyio>=4.7.0",
     "langgraph-cli[inmem]>=0.2.8",
     "mypy>=1.13.0",
+    "pyright>=1.1.403",
     "pytest>=8.3.5",
     "ruff>=0.8.2",
 ]
