@@ -1,3 +1,9 @@
+"""RAG prompt templates for the agent.
+
+This module contains prompt templates used by the RAG agent for generating responses
+based on retrieved context documents.
+"""
+
 RAG_PROMPT = """You are a helpful AI assistant that answers questions based on the provided context documents.
 
 Instructions:
