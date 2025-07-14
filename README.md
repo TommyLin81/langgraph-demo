@@ -1,17 +1,21 @@
 # LangGraph Demo
 
-A RAG (Retrieval-Augmented Generation) AI Agent demo using LangGraph that combines document retrieval with LLM generation for intelligent question answering.
+A RAG AI Agent demo using LangGraph for intelligent question answering.
 
 ## Architecture
 
-The application implements a two-node workflow:
+![LangGraph Workflow](./static/graph.png)
 
-1. **Document Retrieval**: Uses vector similarity search to find relevant documents from a ChromaDB vector store
-2. **Response Generation**: Generates contextual responses using retrieved documents and OpenAI's GPT-4o-mini
+The application uses an intelligent routing workflow:
+
+1. **Question Routing**: Analyzes incoming questions to determine the appropriate response strategy
+2. **Document Retrieval**: Searches ChromaDB vector store for relevant documents
+3. **Direct Response**: Provides immediate answers for simple, general questions
+4. **Response Generation**: Generates contextual responses using retrieved documents and OpenAI's GPT-4o-mini
 
 ### Key Components
 
-- **Vector Store**: ChromaDB with OpenAI embeddings for document retrieval
+- **Vector Store**: ChromaDB with OpenAI embeddings
 - **LLM**: OpenAI GPT-4o-mini for response generation
 - **Graph Engine**: LangGraph for orchestrating the RAG workflow
 - **State Management**: Typed state handling for messages and documents
@@ -25,7 +29,7 @@ The application implements a two-node workflow:
 
 ### For Local Development
 
-- Python 3.12+
+- Python 3.13+
 - OpenAI API key
 - uv package manager
 
@@ -33,13 +37,13 @@ The application implements a two-node workflow:
 
 ### Quick Start with Docker Compose
 
-The fastest way to get started is using Docker Compose:
+Start with Docker Compose:
 
 1. **Create environment file**:
 
    ```bash
    cp .env.example .env
-   # Edit .env and add your OpenAI API key
+   # OPENAI_API_KEY is required
    ```
 
 2. **Start all services**:
@@ -47,6 +51,12 @@ The fastest way to get started is using Docker Compose:
    ```bash
    make docker_up
    ```
+
+   This starts the following services:
+
+   - API Server: RAG agent (port 8123)
+   - PostgreSQL: Stores conversation data and manages background tasks (port 5433)
+   - Redis: Enables real-time streaming of agent responses (port 6379)
 
 3. **Generate AWS documentation index for RAG**:
 
@@ -56,21 +66,17 @@ The fastest way to get started is using Docker Compose:
 
 4. **Access the application**:
    - API: <http://localhost:8123>
-   - LangGraph Studio: <https://smith.langchain.com/studio/?baseUrl=http://localhost:8123> (visual debugging and testing interface)
-   - Agent Chat UI: <https://agentchat.vercel.app> (web frontend - connect to API at `http://localhost:8123`)
-   - PostgreSQL: localhost:5433
-   - Redis: localhost:6379
+   - LangGraph Studio: <https://smith.langchain.com/studio/?baseUrl=http://localhost:8123>
+   - Agent Chat UI: <https://agentchat.vercel.app/?apiUrl=http://localhost:8123&assistantId=agent>
 
 ### Local Development
 
-For local development without Docker:
-
 #### Installation
 
-Install dependencies using uv:
+Install dependencies using the Makefile:
 
 ```bash
-uv sync
+make install
 ```
 
 #### Configuration
@@ -91,10 +97,10 @@ OPENAI_API_KEY=your_openai_api_key_here
 Start the AI agent in developer mode:
 
 ```bash
-uv run langgraph dev --port 2024
+make dev
 ```
 
-This will launch the LangGraph Studio interface - a visual debugging and testing environment for your RAG agent where you can inspect conversation flows, test queries, and monitor agent performance in real-time.
+This launches LangGraph Studio - a visual debugging interface for testing and monitoring your RAG agent.
 
 ## Project Structure
 
@@ -112,14 +118,30 @@ This will launch the LangGraph Studio interface - a visual debugging and testing
 ├── deployment/
 │   └── docker/            # Docker deployment configurations
 ├── data/                  # Vector store data
+├── Makefile               # Development commands
 └── langgraph.json         # LangGraph configuration
 ```
 
-## Usage
+## Development Commands
 
-The RAG agent processes questions through a two-step workflow:
+The Makefile provides convenient commands for development, testing, and deployment.
 
-1. **Document Retrieval**: Searches the vector store for relevant documents based on semantic similarity
-2. **Response Generation**: Uses retrieved documents as context to generate accurate, informed responses
+### Quick Reference
 
-The agent maintains conversation state and can handle follow-up questions while preserving context from previous interactions.
+Run `make help` to see all available commands.
+
+```bash
+# Development
+make install      # Install dependencies
+make dev          # Start LangGraph development server
+make clean        # Clean up build artifacts
+
+# Testing
+make test         # Run unit tests
+make lint         # Run code quality checks
+make format       # Auto-format code
+
+# Docker
+make docker_up    # Start all services
+make docker_down  # Stop services
+```
