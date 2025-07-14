@@ -19,24 +19,32 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest]
-        python-version: ["3.11", "3.12"]
+        python-version: ["3.13"]
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v4
       - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python-version }}
+      - name: Install uv
+        uses: astral-sh/setup-uv@v4
+        with:
+          version: "latest"
+          enable-cache: true
       - name: Install dependencies
         run: |
-          curl -LsSf https://astral.sh/uv/install.sh | sh
-          uv venv
-          uv pip install -r pyproject.toml
-          uv pip install -U pytest-asyncio
+          uv sync --dev
       - name: Run integration tests
+        if: ${{ secrets.OPENAI_API_KEY != '' }}
         env:
-          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
           LANGSMITH_API_KEY: ${{ secrets.LANGSMITH_API_KEY }}
-          LANGSMITH_TRACING: true
+          LANGSMITH_TRACING: ${{ secrets.LANGSMITH_API_KEY != '' }}
         run: |
           uv run pytest tests/integration_tests
+      - name: Skip integration tests (no API key)
+        if: ${{ secrets.OPENAI_API_KEY == '' }}
+        run: |
+          echo "⚠️  Integration tests skipped: OPENAI_API_KEY secret not configured"
+          echo "To run integration tests, add OPENAI_API_KEY to repository secrets"
