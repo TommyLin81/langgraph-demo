@@ -33,6 +33,15 @@ apiServer:
             name: langgraph-demo-secrets
             key: langsmith-api-key
 
+    volumes:
+      - name: vector-store-data
+        persistentVolumeClaim:
+          claimName: vector-store-pvc
+    
+    volumeMounts:
+      - name: vector-store-data
+        mountPath: /deps/langgraph-demo/data
+
 postgres:
   statefulSet:
     # Reduced resources for minikube
