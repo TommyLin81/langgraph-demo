@@ -2,6 +2,8 @@
 
 A RAG AI Agent demo using LangGraph for intelligent question answering.
 
+https://github.com/user-attachments/assets/99472977-c0c3-430f-b88a-9add6daec3f5
+
 ## Architecture
 
 ![LangGraph Workflow](./static/graph.png)
