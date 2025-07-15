@@ -1,4 +1,4 @@
-.PHONY: all help install clean dev test test_watch integration_tests extended_tests lint format typecheck spell_check spell_fix docker_build docker_up docker_down docker_clean gen_aws_docs_index k8s_check k8s_build k8s_helm_setup k8s_deploy k8s_secrets k8s_status k8s_clean k8s_port_forward langgraph_dev langgraph_studio
+.PHONY: all help install clean dev test test_watch integration_tests extended_tests lint format typecheck spell_check spell_fix docker_build docker_up docker_down docker_clean gen_index k8s_check k8s_build k8s_helm_setup k8s_deploy k8s_secrets k8s_status k8s_clean k8s_port_forward langgraph_dev langgraph_studio
 
 # Default target executed when no arguments are given to make.
 all: help
@@ -77,7 +77,7 @@ docker_clean:
 	docker compose -f ./deployment/docker/docker-compose.yml down -v --remove-orphans
 	docker system prune -f
 
-gen_aws_docs_index:
+gen_index:
 	docker compose -f ./deployment/docker/docker-compose.yml exec langgraph-api python src/tools/indexer.py
 
 ######################
@@ -98,11 +98,17 @@ k8s_secrets:
 		sed -e "s/your-openai-api-key-here/$$OPENAI_API_KEY/" -e "s/your-langsmith-api-key-here/$$LANGSMITH_API_KEY/" deployment/k8s/secrets.yaml | kubectl apply -f -; \
 	fi
 
-k8s_deploy: k8s_check k8s_build k8s_helm_setup k8s_secrets
+k8s_pvc:
+	kubectl apply -f deployment/k8s/vector-store-pvc.yaml
+
+k8s_deploy: k8s_check k8s_build k8s_helm_setup k8s_secrets k8s_pvc
 	helm upgrade --install langgraph-demo langchain/langgraph-cloud \
 		--values deployment/k8s/values.yaml \
 		--create-namespace \
 		--namespace langgraph-demo
+
+k8s_gen_index:
+	kubectl exec -n langgraph-demo -it $$(kubectl get pods -n langgraph-demo -l app.kubernetes.io/component=langgraph-demo-langgraph-cloud-api-server -o jsonpath='{.items[0].metadata.name}') -- python src/tools/indexer.py
 
 k8s_port_forward:
 	kubectl port-forward -n langgraph-demo service/langgraph-demo-langgraph-cloud-api-server 8123:80
@@ -151,7 +157,7 @@ help:
 	@echo '  docker_up                    - start all services with Docker Compose'
 	@echo '  docker_down                  - stop all services'
 	@echo '  docker_clean                 - stop services and clean up volumes'
-	@echo '  gen_aws_docs_index           - generate AWS documentation index'
+	@echo '  gen_index           - generate AWS documentation index'
 	@echo ''
 	@echo 'Kubernetes:'
 	@echo '  k8s_check                    - check Kubernetes requirements'

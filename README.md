@@ -70,10 +70,10 @@ Start with Docker Compose:
    - PostgreSQL: Stores conversation data and manages background tasks (port 5433)
    - Redis: Enables real-time streaming of agent responses (port 6379)
 
-3. **Generate AWS documentation index for RAG**:
+3. **Generate AWS documentation index for RAG (one-time setup)**:
 
    ```bash
-   make gen_aws_docs_index
+   make gen_index
    ```
 
 4. **Access the application**:
@@ -108,7 +108,13 @@ Deploy to local kubernetes cluster using minikube:
    make k8s_deploy
    ```
 
-4. **Access the application**:
+4. **Generate AWS documentation index for RAG (one-time setup)**:
+
+   ```bash
+   make k8s_gen_index
+   ```
+
+5. **Access the application**:
 
    ```bash
    make k8s_port_forward
@@ -118,7 +124,7 @@ Deploy to local kubernetes cluster using minikube:
    - LangGraph Studio: <https://smith.langchain.com/studio/?baseUrl=http://localhost:8123>
    - Agent Chat UI: <https://agentchat.vercel.app/?apiUrl=http://localhost:8123&assistantId=agent>
 
-5. **Clean up**:
+6. **Clean up**:
 
    ```bash
    make k8s_clean
