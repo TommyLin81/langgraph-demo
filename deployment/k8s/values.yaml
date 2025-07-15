@@ -1,0 +1,59 @@
+images:
+  apiServerImage:
+    repository: langgraph-demo
+    tag: "latest"
+    pullPolicy: IfNotPresent
+
+apiServer:
+  replicaCount: 1
+  
+  # Reduced resources for minikube
+  resources:
+    limits:
+      cpu: 500m
+      memory: 1Gi
+    requests:
+      cpu: 250m
+      memory: 512Mi
+  
+  deployment:
+    extraEnv:
+      - name: OPENAI_API_KEY
+        valueFrom:
+          secretKeyRef:
+            name: langgraph-demo-secrets
+            key: openai-api-key
+      - name: LANGSMITH_TRACING_V2
+        value: "true"
+      - name: LANGSMITH_PROJECT
+        value: "LANGGRAPH-DEMO"
+      - name: LANGSMITH_API_KEY
+        valueFrom:
+          secretKeyRef:
+            name: langgraph-demo-secrets
+            key: langsmith-api-key
+
+postgres:
+  statefulSet:
+    # Reduced resources for minikube
+    resources:
+      limits:
+        cpu: 250m
+        memory: 512Mi
+      requests:
+        cpu: 100m
+        memory: 256Mi
+
+redis:
+  deployment:
+    # Reduced resources for minikube
+    resources:
+      limits:
+        cpu: 100m
+        memory: 256Mi
+      requests:
+        cpu: 50m
+        memory: 128Mi
+
+studio:
+  enabled: false
