@@ -2,7 +2,7 @@
 
 A RAG AI Agent demo using LangGraph for intelligent question answering.
 
-https://github.com/user-attachments/assets/99472977-c0c3-430f-b88a-9add6daec3f5
+https://github.com/user-attachments/assets/9bc8faed-9544-4485-9604-cda69c6ce206
 
 ## Architecture
 
@@ -85,7 +85,7 @@ Start with Docker Compose:
 
 ### Quick Start with Minikube
 
-Deploy to local kubernetes cluster using minikube:
+Deploy to local Kubernetes cluster:
 
 1. **Start minikube**:
 
@@ -93,7 +93,7 @@ Deploy to local kubernetes cluster using minikube:
    minikube start
    ```
 
-2. **Set require environment variables**:
+2. **Set the required environment variables**:
 
    ```bash
    export OPENAI_API_KEY="your-openai-api-key"
@@ -136,7 +136,7 @@ Deploy to local kubernetes cluster using minikube:
 
 #### Installation
 
-Install dependencies:
+Installing dependencies:
 
 ```bash
 make install
@@ -144,7 +144,7 @@ make install
 
 #### Configuration
 
-Create a `.env` file in the project root:
+Create `.env` file:
 
 ```env
 # Required LLM Token
@@ -190,17 +190,13 @@ This launches LangGraph Studio - a visual debugging interface for testing and mo
 
 ## Development Commands
 
-The Makefile provides convenient commands for development, testing, and deployment.
-
-### Quick Reference
-
-Run `make help` to see all available commands.
+The Makefile provides convenient development, testing, and deployment commands.
 
 ```bash
 # Development
 make install      # Install dependencies
 make dev          # Start LangGraph development server
-make clean        # Clean up build artifacts
+make clean        # Clean build artifacts
 
 # Testing
 make test         # Run unit tests
