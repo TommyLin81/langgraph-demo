@@ -1,4 +1,4 @@
-.PHONY: all help install clean dev test test_watch integration_tests extended_tests lint format typecheck spell_check spell_fix docker_build docker_up docker_down docker_clean gen_aws_docs_index langgraph_dev langgraph_studio
+.PHONY: all help install clean dev test test_watch integration_tests extended_tests lint format typecheck spell_check spell_fix docker_build docker_up docker_down docker_clean gen_aws_docs_index k8s_check k8s_build k8s_helm_setup k8s_deploy k8s_secrets k8s_status k8s_clean k8s_port_forward langgraph_dev langgraph_studio
 
 # Default target executed when no arguments are given to make.
 all: help
@@ -81,6 +81,36 @@ gen_aws_docs_index:
 	docker compose -f ./deployment/docker/docker-compose.yml exec langgraph-api python src/tools/indexer.py
 
 ######################
+# KUBERNETES
+######################
+
+k8s_build:
+	docker build -f ./deployment/docker/Dockerfile -t langgraph-demo:latest .
+
+k8s_helm_setup:
+	helm repo add langchain https://langchain-ai.github.io/helm/ || true
+	helm repo update
+
+k8s_secrets:
+	@if [ -z "$$OPENAI_API_KEY" ] || [ -z "$$LANGSMITH_API_KEY" ]; then \
+		echo "OPENAI_API_KEY or LANGSMITH_API_KEY not set. Please update deployment/k8s/secrets.yaml"; \
+	else \
+		sed -e "s/your-openai-api-key-here/$$OPENAI_API_KEY/" -e "s/your-langsmith-api-key-here/$$LANGSMITH_API_KEY/" deployment/k8s/secrets.yaml | kubectl apply -f -; \
+	fi
+
+k8s_deploy: k8s_check k8s_build k8s_helm_setup k8s_secrets
+	helm upgrade --install langgraph-demo langchain/langgraph-cloud \
+		--values deployment/k8s/values.yaml \
+		--create-namespace \
+		--namespace langgraph-demo
+
+k8s_port_forward:
+	kubectl port-forward -n langgraph-demo service/langgraph-demo-langgraph-cloud-api-server 8123:80
+
+k8s_clean:
+	helm uninstall langgraph-demo -n langgraph-demo
+
+######################
 # LANGGRAPH
 ######################
 
@@ -122,6 +152,15 @@ help:
 	@echo '  docker_down                  - stop all services'
 	@echo '  docker_clean                 - stop services and clean up volumes'
 	@echo '  gen_aws_docs_index           - generate AWS documentation index'
+	@echo ''
+	@echo 'Kubernetes:'
+	@echo '  k8s_check                    - check Kubernetes requirements'
+	@echo '  k8s_build                    - build Docker image for Kubernetes'
+	@echo '  k8s_deploy                   - full deployment to Kubernetes cluster'
+	@echo '  k8s_secrets                  - deploy secrets to Kubernetes'
+	@echo '  k8s_status                   - check Kubernetes deployment status'
+	@echo '  k8s_clean                    - remove Kubernetes deployment'
+	@echo '  k8s_port_forward             - port forward to access application locally'
 	@echo ''
 	@echo 'LangGraph:'
 	@echo '  langgraph_dev                - start LangGraph development server'

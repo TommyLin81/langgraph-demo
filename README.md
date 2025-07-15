@@ -26,12 +26,22 @@ The application uses an intelligent routing workflow:
 
 - Docker and Docker Compose
 - OpenAI API key
+- LangSmith API key
+
+### For Kubernetes (Minikube)
+
+- Docker
+- Minikube
+- kubectl
+- Helm 3.x
+- OpenAI API key
+- LangSmith API key
 
 ### For Local Development
 
 - Python 3.13+
 - OpenAI API key
-- uv package manager
+- UV package manager
 
 ## Getting Started
 
@@ -43,7 +53,9 @@ Start with Docker Compose:
 
    ```bash
    cp .env.example .env
-   # OPENAI_API_KEY is required
+   # Edit .env file with your API keys:
+   # OPENAI_API_KEY (required)
+   # LANGSMITH_API_KEY (required)
    ```
 
 2. **Start all services**:
@@ -69,11 +81,54 @@ Start with Docker Compose:
    - LangGraph Studio: <https://smith.langchain.com/studio/?baseUrl=http://localhost:8123>
    - Agent Chat UI: <https://agentchat.vercel.app/?apiUrl=http://localhost:8123&assistantId=agent>
 
+### Quick Start with Minikube
+
+Deploy to local kubernetes cluster using minikube:
+
+1. **Start minikube**:
+
+   ```bash
+   minikube start
+   ```
+
+2. **Set require environment variables**:
+
+   ```bash
+   export OPENAI_API_KEY="your-openai-api-key"
+   export LANGSMITH_API_KEY="your-langchain-api-key"
+   ```
+
+3. **Build and deploy**:
+
+   ```bash
+   # Build image in minikube's docker environment
+   eval $(minikube docker-env)
+   make k8s_build
+   
+   make k8s_deploy
+   ```
+
+4. **Access the application**:
+
+   ```bash
+   make k8s_port_forward
+   ```
+
+   - API: <http://localhost:8123>
+   - LangGraph Studio: <https://smith.langchain.com/studio/?baseUrl=http://localhost:8123>
+   - Agent Chat UI: <https://agentchat.vercel.app/?apiUrl=http://localhost:8123&assistantId=agent>
+
+5. **Clean up**:
+
+   ```bash
+   make k8s_clean
+   ```
+
 ### Local Development
 
 #### Installation
 
-Install dependencies using the Makefile:
+Install dependencies:
 
 ```bash
 make install
@@ -84,11 +139,14 @@ make install
 Create a `.env` file in the project root:
 
 ```env
-OPENAI_API_KEY=your_openai_api_key_here
+# Required LLM Token
+OPENAI_API_KEY="your_openai_api_key_here"
 
-# Optional: Enable LangSmith for tracing and experiment tracking
-# LANGSMITH_PROJECT="LANGGRAPH-DEMO"
+# Required for LangGraph Server Docker deployment
 # LANGSMITH_API_KEY="your_langsmith_api_key_here"
+
+# Optional: Additional LangSmith configuration for tracing
+# LANGSMITH_PROJECT="LANGGRAPH-DEMO"
 # LANGSMITH_TRACING_V2=true
 ```
 
@@ -144,4 +202,9 @@ make format       # Auto-format code
 # Docker
 make docker_up    # Start all services
 make docker_down  # Stop services
+
+# Kubernetes
+make k8s_build    # Build Docker image
+make k8s_deploy   # Deploy to Kubernetes
+make k8s_clean    # Clean up deployment
 ```
